@@ -16,7 +16,9 @@ class NavWorker(val appContext: Context, workerParams: WorkerParameters) : Worke
             inputData.getString("MessageData") ?: return Result.failure()
         Log.d(TAG, "Performing long running task in scheduled job, with data: $inputData")
 
-        // TODO(developer): add ability to parse the input data to determine which activity to start, not just start the navigation activity
+        // TODO(developer): add ability to parse the input data to determine which activity to start, not just start the navigation activity,
+        //  perhaps have the worker check if the robots location is equal to that of the required location, and if not then start the navigation activity
+
 
         Handler(Looper.getMainLooper()).post(Runnable {
 

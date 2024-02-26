@@ -60,11 +60,14 @@ class ActivityAdapter (private val mActivities: List<ActivityItem>, val context:
         // Set item views based on your views and data model
         val textView = viewHolder.nameTextView
         textView.setText(contact.name)
+        // Sets up the button with the correct reference text when the data is populated, and only able to be clicked if
+        // the viewHolder reference for the button is online
         val button = viewHolder.messageButton
         button.text = if (contact.isOnline) "Start" else "Unavailable"
         button.isEnabled = contact.isOnline
 
         // Sets the button to start the activity located in the path from the given activity context
+        // TODO check if the button is online before setting up the on click listener, unsure if this code runs even if the button is offline
         button.setOnClickListener {
             //val intent = Intent(context, NavTestActivity::class.java)
             val intent = Intent(context, Class.forName(contact.path))
@@ -73,6 +76,7 @@ class ActivityAdapter (private val mActivities: List<ActivityItem>, val context:
     }
 
     // Returns the total count of items in the list
+    // TODO - unused, but maybe relevant if number is high, to sort list by online apps first
     override fun getItemCount(): Int {
         return mActivities.size
     }
