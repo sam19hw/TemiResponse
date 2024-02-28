@@ -157,7 +157,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
                     robot.getMapData()?.locations?.forEach {
                         Log.d("Map", it.toString())
                     }
-                    mapChange("lara lab new", false, position )
+                    mapChange("lara lab new", true, position )
                     targetLocation = "home base"
                 }
 
@@ -167,7 +167,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
                     try {
                         //robot.loadMap("219f6b94d8c13c7c6737ca9351827f3c", false, null)
                         val position = Position(0f,0f,0f,0)
-                        mapChange("Lara hall", false, position)
+                        mapChange("Lara hall", true, position)
                     }catch (e: Exception){
                         Log.e("Map", "Error in loading lara hall map, $e")
                     }
@@ -179,7 +179,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
                     targetLocation = "leaving"
                     try {
-                        mapChange("Lara hall", false, null)
+                        mapChange("Lara hall", true, null)
                     }catch (e: Exception){
                         Log.e("Map", "Error in loading lara hall map, $e")
                     }
@@ -200,6 +200,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
     private fun mapChange(s: String, reposeRequired: Boolean, position: Position?) {
         // TODO add in multi map test, swapping to the map of the hallway in the LARA lab, and then back again to the LARA when in the lab
+        //
         Log.d("Map", "Map change requested with with $s")
         if (mapList.isEmpty()) {
             getMapList()
@@ -248,7 +249,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
             Log.d("Map", "On Load Map Listener status Complete, moving to: $targetLocation")
             if (targetLocation != ""){
                 /* ToDo replace with wait for end of positioning */
-                val secs = 2 // Delay in seconds
+                val secs = 5 // Delay in seconds
 
                 Util.delay(secs) { // Start next Stage after delay
                     Log.d("Nav", "Waited for delay after map change to account for system delays after callback. Going to location $targetLocation")
