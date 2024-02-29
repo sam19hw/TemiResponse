@@ -49,6 +49,25 @@ class MainActivity : AppCompatActivity() {
         // Set layout manager to position the items
         rvContacts.layoutManager = LinearLayoutManager(this)
 
+
+
+
+        // Assign ItemAdapter instance to our RecylerView
+        //binding?.rvItemsList?.adapter = ItemAdapter
+
+        // Applying OnClickListener to our Adapter
+        adapter.setOnClickListener(object :
+            ActivityAdapter.OnClickListener {
+            override fun onClick(position: Int, model: ActivityItem) {
+                val intent = Intent(this@MainActivity, NavTestActivity::class.java)
+                // Passing the data to the
+                // EmployeeDetails Activity
+                //intent.putExtra(NEXT_SCREEN, model)
+                startActivity(intent)
+            }
+        })
+
+
         //Switch to other Activity -- manual override of recycler list
         //val j = Intent(this@MainActivity, MHapp::class.java)
         //val j = Intent(this@MainActivity, MHActivity::class.java)

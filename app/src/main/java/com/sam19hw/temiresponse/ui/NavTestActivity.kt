@@ -17,6 +17,7 @@ import com.robotemi.sdk.model.DetectionData
 import com.robotemi.sdk.navigation.model.Position
 import com.robotemi.sdk.permission.Permission
 import com.sam19hw.temiresponse.R
+import com.sam19hw.temiresponse.data.APICaller
 import com.sam19hw.temiresponse.data.Util
 import com.sam19hw.temiresponse.databinding.ActivityNavTestBinding
 
@@ -26,6 +27,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
     private lateinit var robot: Robot
     private lateinit var binding: ActivityNavTestBinding
     private var targetLocation : String = ""
+    var api: APICaller = APICaller()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -153,6 +155,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
                 "entrance" -> {
                     Log.d("Nav", "entered")
+                    api.OpenDoor(1,false)
                     val position = Position(3.332714f,0.384067f,1.691611f,0)
                     robot.getMapData()?.locations?.forEach {
                         Log.d("Map", it.toString())
@@ -165,6 +168,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
                     Log.d("Nav", "restarting navigation as planned from Home Base")
                     targetLocation = "leaving"
                     try {
+                        api.OpenDoor(1,true)
                         //robot.loadMap("219f6b94d8c13c7c6737ca9351827f3c", false, null)
                         val position = Position(0f,0f,0f,0)
                         mapChange("Lara hall", true, position)
@@ -179,6 +183,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
                     targetLocation = "leaving"
                     try {
+                        api.OpenDoor(1, true)
                         mapChange("Lara hall", true, null)
                     }catch (e: Exception){
                         Log.e("Map", "Error in loading lara hall map, $e")

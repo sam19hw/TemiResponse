@@ -34,6 +34,9 @@ class ActivityAdapter (private val mActivities: List<ActivityItem>, val context:
 
     // Provide a direct reference to each of the views within a data item
     // Used to cache the views within the item layout for fast access
+    private var onClickListener: OnClickListener? = null
+
+
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         // Your holder should contain and initialize a member variable
         // for any view that will be set as you render a row
@@ -70,9 +73,15 @@ class ActivityAdapter (private val mActivities: List<ActivityItem>, val context:
         // TODO check if the button is online before setting up the on click listener, unsure if this code runs even if the button is offline
         button.setOnClickListener {
             //val intent = Intent(context, NavTestActivity::class.java)
-            val intent = Intent(context, Class.forName(contact.path))
-            context.startActivity(intent)
+            buttonClicked(viewHolder, position)
+            //val intent = Intent(context, Class.forName(contact.path))
+            //context.startActivity(intent)
         }
+    }
+
+    fun buttonClicked (viewHolder: ActivityAdapter.ViewHolder, position: Int) {
+        val intent = Intent(context, Class.forName(mActivities.get(position).path))
+        context.startActivity(intent)
     }
 
     // Returns the total count of items in the list
@@ -81,5 +90,13 @@ class ActivityAdapter (private val mActivities: List<ActivityItem>, val context:
         return mActivities.size
     }
 
+    // A function to bind the onclickListener.
+    fun setOnClickListener(onClickListener: OnClickListener) {
+        this.onClickListener = onClickListener
+    }
 
+    // onClickListener Interface
+    interface OnClickListener {
+        fun onClick(position: Int, model: ActivityItem)
+    }
 }
