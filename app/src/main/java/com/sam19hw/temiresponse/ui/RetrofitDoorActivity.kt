@@ -1,5 +1,6 @@
 package com.sam19hw.temiresponse.ui
 
+import android.graphics.Path.Op
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -18,6 +19,10 @@ class RetrofitDoorActivity : AppCompatActivity() {
         setContentView(R.layout.activity_retrofit_door)
         binding = ActivityRetrofitDoorBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.button3.setOnClickListener { OpenDoor() }
+        binding.button3.text = "Open Door"
+        binding.button4.setOnClickListener { CloseDoor() }
+        binding.button4.text = "Close Door"
         Log.d("RetrofitActivity","Activity Started")
     }
 

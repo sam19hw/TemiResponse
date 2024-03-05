@@ -59,7 +59,8 @@ class MainActivity : AppCompatActivity() {
         adapter.setOnClickListener(object :
             ActivityAdapter.OnClickListener {
             override fun onClick(position: Int, model: ActivityItem) {
-                val intent = Intent(this@MainActivity, NavTestActivity::class.java)
+                val intent = Intent(this@MainActivity, Class.forName(model.path))
+                //val intent = Intent(this@MainActivity, NavTestActivity::class.java)
                 // Passing the data to the
                 // EmployeeDetails Activity
                 //intent.putExtra(NEXT_SCREEN, model)

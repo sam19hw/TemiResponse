@@ -32,14 +32,12 @@ public class APICaller {
                 Log.d("api", "Got a response from the api on set position " + response);
                 success = true;
             }
-
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 Log.e("api", "error: An error has occured, no response recieved");
                 success = false;
             }
         });
-
 
         success = true;
         return success;

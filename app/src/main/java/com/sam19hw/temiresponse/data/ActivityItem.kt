@@ -59,15 +59,15 @@ class ActivityAdapter (private val mActivities: List<ActivityItem>, val context:
     // Involves populating data into the item through holder
     override fun onBindViewHolder(viewHolder: ActivityAdapter.ViewHolder, position: Int) {
         // Get the data model based on position
-        val contact: ActivityItem = mActivities.get(position)
+        val item: ActivityItem = mActivities.get(position)
         // Set item views based on your views and data model
         val textView = viewHolder.nameTextView
-        textView.setText(contact.name)
+        textView.setText(item.name)
         // Sets up the button with the correct reference text when the data is populated, and only able to be clicked if
         // the viewHolder reference for the button is online
         val button = viewHolder.messageButton
-        button.text = if (contact.isOnline) "Start" else "Unavailable"
-        button.isEnabled = contact.isOnline
+        button.text = if (item.isOnline) "Start" else "Unavailable"
+        button.isEnabled = item.isOnline
 
         // Sets the button to start the activity located in the path from the given activity context
         // TODO check if the button is online before setting up the on click listener, unsure if this code runs even if the button is offline
@@ -76,6 +76,11 @@ class ActivityAdapter (private val mActivities: List<ActivityItem>, val context:
             buttonClicked(viewHolder, position)
             //val intent = Intent(context, Class.forName(contact.path))
             //context.startActivity(intent)
+        }
+        viewHolder.itemView.setOnClickListener {
+            if (onClickListener != null) {
+                onClickListener!!.onClick(position, mActivities.get(position) )
+            }
         }
     }
 
