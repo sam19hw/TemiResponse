@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.widget.Toast
 import com.sam19hw.temiresponse.R
 import com.sam19hw.temiresponse.data.APICaller
 import com.sam19hw.temiresponse.databinding.ActivityRetrofitDoorBinding
@@ -23,16 +24,27 @@ class RetrofitDoorActivity : AppCompatActivity() {
         binding.button3.text = "Open Door"
         binding.button4.setOnClickListener { CloseDoor() }
         binding.button4.text = "Close Door"
+        binding.imageButton.setOnClickListener {
+            Log.d("NavApp","Finishing activity due to user click event")
+            finish()
+        }
         Log.d("RetrofitActivity","Activity Started")
     }
 
     public fun OpenDoor(){
-        api.OpenDoor(doorNumber,true)
+        val res = api.OpenDoor(doorNumber,true)
         Log.d("RetrofitActivity","Opening Door number: " + doorNumber)
+        if (res) {
+            Toast.makeText(this, "Door opening Successful", Toast.LENGTH_SHORT)
+        } else  {Toast.makeText(this, "Door opening failed", Toast.LENGTH_SHORT)}
     }
     public fun CloseDoor(){
-        api.OpenDoor(doorNumber,false)
+        val res = api.OpenDoor(doorNumber,false)
         Log.d("RetrofitActivity","Closing Door number: " + doorNumber)
+
+        if (res) {
+            Toast.makeText(this, "Door closing Successful", Toast.LENGTH_SHORT)
+        } else  {Toast.makeText(this, "Door closing failed", Toast.LENGTH_SHORT)}
     }
 
 }

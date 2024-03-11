@@ -14,7 +14,7 @@ public class APICaller {
     public boolean OpenDoor(int number, boolean state){
         // TODO add in the logic to select the correct door based on the number and then change the base URL
 
-        Log.d("api", "Making Position API call to open door");
+        Log.d("api", "Making Position API call to open door " + number);
 
         // reformatting due to the turn query needs on / off as opposed to true / false
         String stateString;
