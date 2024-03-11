@@ -86,7 +86,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
             Log.d("map", "location ${robot.getMapData()?.locations?.toString()}")
             if (targetLocation != "") {
                 Log.d("Nav", "Robot ready, resuming goal to go to $targetLocation")
-                //robot.goTo(targetLocation)
+                robot.goTo(targetLocation)
             }
         }
     }
@@ -155,12 +155,16 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
                 "entrance" -> {
                     Log.d("Nav", "entered")
-                    api.OpenDoor(1,false)
+                    try {
+                        //api.OpenDoor(1,false)
+                    }catch (e: Exception){
+                        Log.e("api", "Error in closing lara hall door, $e")
+                    }
                     val position = Position(3.332714f,0.384067f,1.691611f,0)
                     robot.getMapData()?.locations?.forEach {
                         Log.d("Map", it.toString())
                     }
-                    mapChange("lara lab new", true, position )
+                    mapChange("fourier", true, position )
                     targetLocation = "home base"
                 }
 
@@ -168,10 +172,14 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
                     Log.d("Nav", "restarting navigation as planned from Home Base")
                     targetLocation = "leaving"
                     try {
-                        api.OpenDoor(1,true)
+                        //api.OpenDoor(1,true)
+                    }catch (e: Exception){
+                        Log.e("api", "Error in opening lara hall door, $e")
+                    }
+                    try {
                         //robot.loadMap("219f6b94d8c13c7c6737ca9351827f3c", false, null)
                         val position = Position(0f,0f,0f,0)
-                        mapChange("Lara hall", true, position)
+                        mapChange("fourier lab", true, position)
                     }catch (e: Exception){
                         Log.e("Map", "Error in loading lara hall map, $e")
                     }
@@ -183,15 +191,22 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
                     targetLocation = "leaving"
                     try {
-                        api.OpenDoor(1, true)
-                        mapChange("Lara hall", true, null)
+                        //api.OpenDoor(1,true)
+                    }catch (e: Exception){
+                        Log.e("api", "Error in opening lara hall door, $e")
+                    }
+                    try {
+                        //robot.loadMap("219f6b94d8c13c7c6737ca9351827f3c", false, null)
+                        val position = Position(0f,0f,0f,0)
+                        //LayerPose(x=-0.07379, y=0.004862, theta=-0.001249)
+                        mapChange("fourier lab", true, position)
                     }catch (e: Exception){
                         Log.e("Map", "Error in loading lara hall map, $e")
                     }
                 }
             }
         } else if (status == "abort") {
-            val secs = 2 // Delay in seconds
+            val secs = 5 // Delay in seconds
             Log.e("Nav", "Navigation aborted, retrying in $secs seconds")
             robot.repose()
 

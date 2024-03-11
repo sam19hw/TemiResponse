@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         activityItems.add(ActivityItem.createActivity("NavTestActivity", "com.sam19hw.temiresponse.ui.NavTestActivity",  true))
         activityItems.add(ActivityItem.createActivity("MHActivity", "com.sam19hw.temiresponse.ui.checkin.MHActivity", true))
         activityItems.add(ActivityItem.createActivity("MHapp", "com.sam19hw.temiresponse.ui.checkin.MHapp", false))
+        activityItems.add(ActivityItem.createActivity("RetrofitDoor", "com.sam19hw.temiresponse.ui.RetrofitDoorActivity", true))
         activityItems.add(ActivityItem.createActivity("FirebaseTestActivity", "com.sam19hw.temiresponse.data.fcm.messaging", false))
         activityItems.add(ActivityItem.createActivity("ThresholdCrossing", "com.sam19hw.temiresponse.ui.ThresholdCrossing", false))
         activityItems.add(ActivityItem.createActivity("TemiControllerJetpack", "com.sam19hw.temiresponse.ui.TemiControllerJetpack", false))
