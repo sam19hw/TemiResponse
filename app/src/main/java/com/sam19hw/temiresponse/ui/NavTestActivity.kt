@@ -14,6 +14,7 @@ import com.robotemi.sdk.listeners.OnRobotReadyListener
 import com.robotemi.sdk.map.MapModel
 import com.robotemi.sdk.map.OnLoadMapStatusChangedListener
 import com.robotemi.sdk.model.DetectionData
+import com.robotemi.sdk.navigation.listener.OnReposeStatusChangedListener
 import com.robotemi.sdk.navigation.model.Position
 import com.robotemi.sdk.permission.Permission
 import com.sam19hw.temiresponse.R
@@ -22,7 +23,7 @@ import com.sam19hw.temiresponse.data.Util
 import com.sam19hw.temiresponse.databinding.ActivityNavTestBinding
 
 class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocationStatusChangedListener,
-    OnLocationsUpdatedListener, OnDetectionStateChangedListener, OnDetectionDataChangedListener, OnLoadMapStatusChangedListener {
+    OnLocationsUpdatedListener, OnDetectionStateChangedListener, OnDetectionDataChangedListener, OnLoadMapStatusChangedListener, OnReposeStatusChangedListener {
 
     private lateinit var robot: Robot
     private lateinit var binding: ActivityNavTestBinding
@@ -37,11 +38,16 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
         binding = ActivityNavTestBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        Log.d("MHApp", "Start Layout Loaded")
+        Log.d("NavApp", "Start Layout Loaded")
+
+        binding.backButton.setOnClickListener {
+            Log.d("NavApp","Finishing activity due to user click event")
+            finish()
+        }
 
         robot = Robot.getInstance()
         targetLocation = "home base"
-        robot.goTo(targetLocation)
+        //robot.goTo(targetLocation)
         //mapChange("Lara hall", false, null)
 
     }
@@ -269,6 +275,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
             Log.d("Map", "On Load Map Listener status Complete, moving to: $targetLocation")
             if (targetLocation != ""){
                 /* ToDo replace with wait for end of positioning */
+                // TODO Adding in longer waits allows for more time for the robot to position,l as this is commonly quite long, for non trivial location changes
                 val secs = 5 // Delay in seconds
 
                 Util.delay(secs) { // Start next Stage after delay
@@ -280,4 +287,22 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
         }
         else Log.d("Map", "On Load Map Listener status $status")
     }
+
+    override fun onReposeStatusChanged(status: Int, description: String) {
+        //TODO("Not yet implemented, Need to use as a method to check if the robot is repositioning," +
+        //        "and if so delay all robot.goto commands until repose is complete")
+
+        Log.d("Map","Repose status changed with status $status and description $description")
+        val secs = 10 // Delay in seconds
+
+        Util.delay(secs) { // Start next Stage after delay
+            Log.d("Nav", "Waited for delay after positioning to account for system delays after callback. Ending and assuming that the code will restart going to $targetLocation")
+            //robot.goTo(targetLocation)
+        }
+        //targetLocation = ""
+        //
+
+    }
+
+
 }

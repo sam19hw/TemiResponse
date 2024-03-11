@@ -262,6 +262,7 @@ public class MHActivity extends AppCompatActivity implements Robot.NlpListener,O
 
                 //mHRestart();
                 robot.goTo("home base");
+                finish();
                 break;
         }
     }
