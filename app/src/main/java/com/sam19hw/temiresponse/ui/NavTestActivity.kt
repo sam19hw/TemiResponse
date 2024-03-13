@@ -61,6 +61,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
         Robot.getInstance().addOnDetectionStateChangedListener(this)
         Robot.getInstance().addOnDetectionDataChangedListener(this)
         Robot.getInstance().addOnLoadMapStatusChangedListener(this)
+        Robot.getInstance().addOnReposeStatusChangedListener(this)
     }
 
     override fun onStop() {
@@ -71,6 +72,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
         Robot.getInstance().removeOnDetectionStateChangedListener(this)
         Robot.getInstance().removeOnDetectionDataChangedListener(this)
         //Robot.getInstance().removeOnLoadMapStatusChangedListener(this)
+        Robot.getInstance().removeOnReposeStatusChangedListener(this)
     }
 
 
@@ -290,18 +292,15 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
     override fun onReposeStatusChanged(status: Int, description: String) {
         //TODO("Not yet implemented, Need to use as a method to check if the robot is repositioning," +
-        //        "and if so delay all robot.goto commands until repose is complete")
+        //        "and if so delay all robot.goto commands until repose is complete,
+        //        Make a function that calls the robot.goto, only if the class bool, repositioning, is false,
+        //        if true then wait 2 secs and then recall the function. Then change all robot.goto to that function")
 
         Log.d("Map","Repose status changed with status $status and description $description")
-        val secs = 10 // Delay in seconds
 
-        Util.delay(secs) { // Start next Stage after delay
-            Log.d("Nav", "Waited for delay after positioning to account for system delays after callback. Ending and assuming that the code will restart going to $targetLocation")
-            //robot.goTo(targetLocation)
+        if (status==4){
+            Log.d("Nav", "Waited for delay in Repose after positioning to account for system delays after callback. Ending and assuming that the code will restart going to $targetLocation")
         }
-        //targetLocation = ""
-        //
-
     }
 
 

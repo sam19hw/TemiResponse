@@ -86,4 +86,5 @@
         vestibulum. Fusce dictum libero quis erat maximus, vitae volutpat diam dignissim.
     </string>
     <string name="Header_2">Temi Response Debug Menu</string>
+    <string name="TestWorker">Run Worker Thread for Data Message</string>
 </resources>

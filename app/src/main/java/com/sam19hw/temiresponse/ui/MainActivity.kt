@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
+import com.robotemi.sdk.Robot
 import com.sam19hw.temiresponse.data.ActivityItem
 import com.sam19hw.temiresponse.data.ActivityAdapter
 import com.sam19hw.temiresponse.databinding.ActivityMainBinding
@@ -25,6 +26,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+        Robot.getInstance().showTopBar()
         val activityItems = ArrayList<ActivityItem>()
 
 
@@ -37,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         activityItems.add(ActivityItem.createActivity("MHActivity", "com.sam19hw.temiresponse.ui.checkin.MHActivity", true))
         activityItems.add(ActivityItem.createActivity("MHapp", "com.sam19hw.temiresponse.ui.checkin.MHapp", false))
         activityItems.add(ActivityItem.createActivity("RetrofitDoor", "com.sam19hw.temiresponse.ui.RetrofitDoorActivity", true))
-        activityItems.add(ActivityItem.createActivity("FirebaseTestActivity", "com.sam19hw.temiresponse.data.fcm.messaging", false))
+        activityItems.add(ActivityItem.createActivity("FirebaseTestActivity", "com.sam19hw.temiresponse.ui.FcmActivity", true))
         activityItems.add(ActivityItem.createActivity("ThresholdCrossing", "com.sam19hw.temiresponse.ui.ThresholdCrossing", false))
         activityItems.add(ActivityItem.createActivity("TemiControllerJetpack", "com.sam19hw.temiresponse.ui.TemiControllerJetpack", false))
         activityItems.add(ActivityItem.createActivity("TemiLayout", "com.sam19hw.temiresponse.ui.TemiLayout", false))
@@ -76,5 +78,10 @@ class MainActivity : AppCompatActivity() {
         //val j = Intent(this@MainActivity, NavTestActivity::class.java)
         //startActivity(j)
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Robot.getInstance().showTopBar()
     }
 }

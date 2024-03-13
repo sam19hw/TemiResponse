@@ -13,6 +13,9 @@
         android:theme="@style/Theme.TemiResponse"
         tools:targetApi="31">
         <activity
+            android:name=".ui.FcmActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.RetrofitDoorActivity"
             android:exported="false" />
         <activity

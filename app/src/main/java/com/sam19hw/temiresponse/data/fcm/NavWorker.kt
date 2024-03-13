@@ -12,9 +12,13 @@ import com.sam19hw.temiresponse.ui.NavTestActivity
 class NavWorker(val appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
 
     override fun doWork(): Result {
-        val inputData =
-            inputData.getString("MessageData") ?: return Result.failure()
-        Log.d(TAG, "Performing long running task in scheduled job, with data: $inputData")
+        //val inoutSize = inputData.size()
+        val service =
+            inputData.getString("service") ?: return Result.failure()
+        val users =
+            inputData.getString("user") ?: return Result.failure()
+
+        Log.d(TAG, "Performing long running task in scheduled job, with data: $service, $users")
 
         // TODO(developer): add ability to parse the input data to determine which activity to start, not just start the navigation activity,
         //  perhaps have the worker check if the robots location is equal to that of the required location, and if not then start the navigation activity
