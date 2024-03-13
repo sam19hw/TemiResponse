@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.sam19hw.temiresponse.R
 import com.sam19hw.temiresponse.data.APICaller
 import com.sam19hw.temiresponse.databinding.ActivityRetrofitDoorBinding
+import com.sam19hw.temiresponse.data.DigestAuth as DigestAuth
 
 class RetrofitDoorActivity : AppCompatActivity() {
     private lateinit var binding: ActivityRetrofitDoorBinding
@@ -28,6 +29,7 @@ class RetrofitDoorActivity : AppCompatActivity() {
             Log.d("NavApp","Finishing activity due to user click event")
             finish()
         }
+        binding.button5.setOnClickListener { digestOff() }
         Log.d("RetrofitActivity","Activity Started")
     }
 
@@ -45,6 +47,15 @@ class RetrofitDoorActivity : AppCompatActivity() {
         if (res) {
             Toast.makeText(this, "Door closing Successful", Toast.LENGTH_SHORT)
         } else  {Toast.makeText(this, "Door closing failed", Toast.LENGTH_SHORT)}
+    }
+
+    public fun digestOff(){
+        var digest: DigestAuth = DigestAuth()
+        var response = digest.sendRequest()
+        if (!response.isNullOrEmpty()){
+            Toast.makeText(this, "Door closing Successful", Toast.LENGTH_SHORT)
+        } else  {Toast.makeText(this, "Door closing failed", Toast.LENGTH_SHORT)}
+
     }
 
 }
