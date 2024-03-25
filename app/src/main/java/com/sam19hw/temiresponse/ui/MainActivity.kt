@@ -2,23 +2,21 @@ package com.sam19hw.temiresponse.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MotionEvent
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.*
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.robotemi.sdk.Robot
-import com.sam19hw.temiresponse.data.ActivityItem
 import com.sam19hw.temiresponse.data.ActivityAdapter
+import com.sam19hw.temiresponse.data.ActivityItem
 import com.sam19hw.temiresponse.databinding.ActivityMainBinding
-
 
 class MainActivity : AppCompatActivity() {
 
-
     lateinit var binding: ActivityMainBinding
-
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,9 +24,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
+
+        // Obtain the FirebaseAnalytics instance.
+        firebaseAnalytics = Firebase.analytics
+
         Robot.getInstance().showTopBar()
         val activityItems = ArrayList<ActivityItem>()
-
 
         // Lookup the recyclerview in activity binding
         val rvContacts = binding.recycler
@@ -53,8 +54,6 @@ class MainActivity : AppCompatActivity() {
         rvContacts.layoutManager = LinearLayoutManager(this)
 
 
-
-
         // Assign ItemAdapter instance to our RecylerView
         //binding?.rvItemsList?.adapter = ItemAdapter
 
@@ -62,6 +61,12 @@ class MainActivity : AppCompatActivity() {
         adapter.setOnClickListener(object :
             ActivityAdapter.OnClickListener {
             override fun onClick(position: Int, model: ActivityItem) {
+                var bundle: Bundle = Bundle()
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, position.toString())
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, model.name)
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "app")
+                firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle)
+
                 val intent = Intent(this@MainActivity, Class.forName(model.path))
                 //val intent = Intent(this@MainActivity, NavTestActivity::class.java)
                 // Passing the data to the
@@ -70,7 +75,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         })
-
 
         //Switch to other Activity -- manual override of recycler list
         //val j = Intent(this@MainActivity, MHapp::class.java)

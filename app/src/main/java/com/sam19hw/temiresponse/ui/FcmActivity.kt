@@ -77,6 +77,19 @@ class FcmActivity : AppCompatActivity() {
             }
             // [END handle_data_extras]
 
+            Log.d(TAG, "Subscribing to AlarmResponse topic")
+            // [START subscribe_topics]
+            Firebase.messaging.subscribeToTopic("AlarmResponse")
+                .addOnCompleteListener { task ->
+                    var msg = getString(R.string.Alarm_Subscribed)
+                    if (!task.isSuccessful) {
+                        msg = getString(R.string.Alarm_Subscribed_Failed)
+                    }
+                    Log.d(TAG, msg)
+                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                }
+            // [END subscribe_topics]
+
             binding.subscribeButton.setOnClickListener {
                 Log.d(TAG, "Subscribing to testMSG topic")
                 // [START subscribe_topics]

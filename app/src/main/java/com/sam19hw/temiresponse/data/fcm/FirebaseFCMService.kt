@@ -8,11 +8,15 @@ import android.content.Context
 import android.content.Intent
 import android.media.RingtoneManager
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.workDataOf
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.sam19hw.temiresponse.ui.MainActivity
@@ -37,8 +41,28 @@ class FirebaseFCMService : FirebaseMessagingService() {
         // messages. For more see: https://firebase.google.com/docs/cloud-messaging/concept-options
         // [END_EXCLUDE]
 
+        // Obtain the FirebaseAnalytics instance.
+        try {
+            // Obtain the FirebaseAnalytics instance.
+            firebaseAnalytics = Firebase.analytics
+            firebaseOnline = true
+        }catch (e: Throwable){
+            Log.e(TAG, "Could not initialise Firebase analytics, continuing without")
+            firebaseOnline = false
+        }
+
         // Not getting messages here? See why this may be: https://goo.gl/39bRNJ
         Log.d(TAG, "From: ${remoteMessage.from}")
+
+        // Remote Log of data to Firebase Analytics, provides log that the message was sent and received
+        if (firebaseOnline) {
+            var bundle: Bundle = Bundle()
+            bundle.putString(FirebaseAnalytics.Param.ITEM_ID, remoteMessage.messageId)
+            bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, remoteMessage.from)
+            bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "message")
+            //firebaseAnalytics.logEvent(FirebaseAnalytics.Event.LEVEL_START, bundle)
+            firebaseAnalytics.logEvent("fcm_received", bundle)
+        }
 
         // Check if message contains a data payload.
         if (remoteMessage.data.isNotEmpty()) {
@@ -72,6 +96,9 @@ class FirebaseFCMService : FirebaseMessagingService() {
     //TODO find way to determine based on data type what the length of execution will be
     private fun isLongRunningJob() = true
 
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+    private var firebaseOnline : Boolean = false
+
     // [START on_new_token]
     /**
      * Called if the FCM registration token is updated. This may occur if the security of
@@ -95,9 +122,13 @@ class FirebaseFCMService : FirebaseMessagingService() {
      */
     private fun scheduleJob(remoteMessage: RemoteMessage) {
         // [START dispatch_job]
+        Log.d(TAG,"Scheduling job, starting worker thread")
         val work = OneTimeWorkRequest.Builder(NavWorker::class.java)
             .setInputData(workDataOf(
-                "MessageData" to remoteMessage.data
+                "UserId" to remoteMessage.data["UserId"],
+                "ServiceName" to remoteMessage.data["ServiceName"],
+                "AlarmTime" to remoteMessage.data["AlarmTime"],
+                "Location" to remoteMessage.data["Location"]
             )).build()
         WorkManager.getInstance(this).beginWith(work).enqueue()
         // [END dispatch_job]
@@ -108,7 +139,7 @@ class FirebaseFCMService : FirebaseMessagingService() {
      * Stub Not in Use
      */
     private fun handleNow() {
-        Log.d(TAG, "Short lived task is done.")
+        Log.e(TAG, "TODO: Short lived task is not implemented now")
     }
 
     /**
@@ -123,6 +154,12 @@ class FirebaseFCMService : FirebaseMessagingService() {
      */
     private fun sendRegistrationToServer(token: String?) {
         Log.d(TAG, "sendRegistrationTokenToServer($token)")
+    }
+
+    public fun sendMessage(data: String, topic: String) {
+        TODO("Send Message function has not been tested")
+        Log.d(TAG, "sending message to topic $data")
+
     }
 
     /**

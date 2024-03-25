@@ -5,6 +5,9 @@ import android.content.ContentValues
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.robotemi.sdk.Robot
 import com.robotemi.sdk.listeners.OnDetectionDataChangedListener
 import com.robotemi.sdk.listeners.OnDetectionStateChangedListener
@@ -20,6 +23,7 @@ import com.robotemi.sdk.permission.Permission
 import com.sam19hw.temiresponse.R
 import com.sam19hw.temiresponse.data.APICaller
 import com.sam19hw.temiresponse.data.Util
+import com.sam19hw.temiresponse.data.fcm.NavWorker
 import com.sam19hw.temiresponse.databinding.ActivityNavTestBinding
 
 class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocationStatusChangedListener,
@@ -29,6 +33,10 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
     private lateinit var binding: ActivityNavTestBinding
     private var targetLocation : String = ""
     var api: APICaller = APICaller()
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+    private var firebaseOnline : Boolean = false
+    private var isPositioning : Boolean = false
+    private var isMapChanging : Boolean = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -37,8 +45,17 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
         binding = ActivityNavTestBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         Log.d("NavApp", "Start Layout Loaded")
+
+        try {
+            // Obtain the FirebaseAnalytics instance.
+            firebaseAnalytics = Firebase.analytics
+            firebaseOnline = true
+        }catch (e: Throwable){
+            Log.e(TAG, "Could not initialise Firebase analytics, continuing without")
+            firebaseOnline = false
+
+        }
 
         binding.backButton.setOnClickListener {
             Log.d("NavApp","Finishing activity due to user click event")
@@ -47,8 +64,10 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
         robot = Robot.getInstance()
         targetLocation = "home base"
-        //robot.goTo(targetLocation)
-        //mapChange("Lara hall", false, null)
+
+        goto(targetLocation)
+        val position = Position(0f,0f,0f,0)
+        //mapChange("Lara hall", false, position)
 
     }
 
@@ -85,16 +104,16 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
                 true,
                 2.0f
             ) // Set detection mode on; set detection distance to be 2.0 m
-            Log.i(ContentValues.TAG, "Set track user: ON")
+            //Log.i(ContentValues.TAG, "Set track user: ON")
             //robot?.SetTrackUser(true) // Set tracking mode on
             //Robot.getInstance().trackUserOn(true) // Set tracking mode on
-            Robot.getInstance().trackUserOn // Set tracking mode on through the parent instance due to type miss-match
+            //Robot.getInstance().trackUserOn // Set tracking mode on through the parent instance due to type miss-match
             // Note: When exiting the application, track user will still be enabled unless manually disabled
             Log.d("Map", "${robot.getMapList()}")
             Log.d("map", "location ${robot.getMapData()?.locations?.toString()}")
             if (targetLocation != "") {
                 Log.d("Nav", "Robot ready, resuming goal to go to $targetLocation")
-                robot.goTo(targetLocation)
+                goto(targetLocation)
             }
         }
     }
@@ -142,29 +161,29 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
             when (location) {
                 "leaving" -> {
                     Log.d("Nav", "Leaving")
-                    robot.goTo("left")
+                    goto("left")
                 }
 
                 "left" -> {
                     Log.d("Nav", "Left")
                     //mapChange("hall")
-                    robot.goTo("lift entrance")
+                    goto("lift entrance")
                 }
 
                 "lift entrance" -> {
                     Log.d("Nav", "Starting multi location cross to enter")
-                    robot.goTo("entering")
+                    goto("entering")
                 }
 
                 "entering" -> {
                     Log.d("Nav", "Entering")
-                    robot.goTo("entrance")
+                    goto("entrance")
                 }
 
                 "entrance" -> {
                     Log.d("Nav", "entered")
                     try {
-                        //api.OpenDoor(1,false)
+                        api.OpenDoor(1,false)
                     }catch (e: Exception){
                         Log.e("api", "Error in closing lara hall door, $e")
                     }
@@ -172,22 +191,24 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
                     robot.getMapData()?.locations?.forEach {
                         Log.d("Map", it.toString())
                     }
-                    mapChange("fourier", true, position )
+                    //mapChange("fourier", true, position )
                     targetLocation = "home base"
+                    goto(targetLocation)
                 }
 
                 "Home Base" -> {
                     Log.d("Nav", "restarting navigation as planned from Home Base")
                     targetLocation = "leaving"
                     try {
-                        //api.OpenDoor(1,true)
+                        api.OpenDoor(1,true)
                     }catch (e: Exception){
                         Log.e("api", "Error in opening lara hall door, $e")
                     }
                     try {
                         //robot.loadMap("219f6b94d8c13c7c6737ca9351827f3c", false, null)
                         val position = Position(0f,0f,0f,0)
-                        mapChange("fourier lab", true, position)
+                        //mapChange("fourier lab", true, position)
+                        goto(targetLocation)
                     }catch (e: Exception){
                         Log.e("Map", "Error in loading lara hall map, $e")
                     }
@@ -199,7 +220,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
                     targetLocation = "leaving"
                     try {
-                        //api.OpenDoor(1,true)
+                        api.OpenDoor(1,true)
                     }catch (e: Exception){
                         Log.e("api", "Error in opening lara hall door, $e")
                     }
@@ -207,7 +228,8 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
                         //robot.loadMap("219f6b94d8c13c7c6737ca9351827f3c", false, null)
                         val position = Position(0f,0f,0f,0)
                         //LayerPose(x=-0.07379, y=0.004862, theta=-0.001249)
-                        mapChange("fourier lab", true, position)
+                        //mapChange("fourier lab", true, position)
+                        goto(targetLocation)
                     }catch (e: Exception){
                         Log.e("Map", "Error in loading lara hall map, $e")
                     }
@@ -220,7 +242,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
 
             Util.delay(secs) { // Start next Stage after delay
                 Log.d("Nav", "Waited for delay after navigation aborted to account for system delays after callback. Going to location $location")
-                robot.goTo(location)
+                goto(location)
             }
         }
 
@@ -254,7 +276,7 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
             Log.d("Map", "Map change initiated successfully")
         } else  {
             Log.d("Map", "Map did not change with $pos and $mapList")
-            robot.goTo(targetLocation)
+            goto(targetLocation)
         }
     }
 
@@ -275,23 +297,60 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
     override fun onLoadMapStatusChanged(status: Int) {
         if (status == 0) {
             Log.d("Map", "On Load Map Listener status Complete, moving to: $targetLocation")
-            if (targetLocation != ""){
-                /* ToDo replace with wait for end of positioning */
-                // TODO Adding in longer waits allows for more time for the robot to position,l as this is commonly quite long, for non trivial location changes
-                val secs = 5 // Delay in seconds
+            isMapChanging = false
+            // Remote Log of data to Firebase Analytics, provides log that the map change was completed successfully
+            if (firebaseOnline) {
+                var bundle: Bundle = Bundle()
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "MapService")
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Map Change")
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Complete")
 
-                Util.delay(secs) { // Start next Stage after delay
-                    Log.d("Nav", "Waited for delay after map change to account for system delays after callback. Going to location $targetLocation")
-                    robot.goTo(targetLocation)
-                }
-                //targetLocation = ""
+                firebaseAnalytics.logEvent("Map_Change", bundle)
+            }
+           if (targetLocation != ""){
+               /*                 /* ToDo replace with wait for end of positioning */
+                               // TODO Adding in longer waits allows for more time for the robot to position,l as this is commonly quite long, for non trivial location changes
+                               val secs = 5 // Delay in seconds
+
+                               Util.delay(secs) { // Start next Stage after delay
+                                   Log.d("Nav", "Waited for delay after map change to account for system delays after callback. Going to location $targetLocation")
+                                   goto(targetLocation)
+                               }
+               */                //targetLocation = ""
+               if (!isPositioning) {
+                   goto(targetLocation)
+               } else {
+                   Log.d(TAG, "Positioning in Progress, setting target location in stead, once positioning is complete should begin navigation to $targetLocation")
+               }
             }
         }
-        else Log.d("Map", "On Load Map Listener status $status")
+        else if (robot.isReady && !isMapChanging)  {
+            Log.d("Map", "On Load Map Listener status $status, robot is ready")
+            isMapChanging = true
+        }
+        else {
+            Log.d("Map", "On Load Map Listener status $status, robot is not ready")
+            isMapChanging = true
+        }
+    }
+
+    // goto function that handles states of navigation to make sure that base robot.goTo commands are handled correctly
+    //      Needed as error handling, and multiple requests are not handled well in TEMi functions
+    private fun goto (location : String) {
+        if (targetLocation != location){
+            targetLocation = location
+        }
+
+        if (robot.isReady && !isPositioning && !isMapChanging) {
+            robot.goTo(targetLocation)
+        } else if (robot.isReady){
+            Log.d(TAG, "Positioning is $isPositioning, Map change in progress is $isMapChanging, setting target location in stead, " +
+                    "once positioning and or map change is complete should begin navigation to $targetLocation")
+        } else Log.e(TAG, "robot is not ready, setting target location instead, will be resumed on robot ready")
     }
 
     override fun onReposeStatusChanged(status: Int, description: String) {
-        //TODO("Not yet implemented, Need to use as a method to check if the robot is repositioning," +
+        //TODO("Not yet tested, Need to use as a method to check if the robot is repositioning," +
         //        "and if so delay all robot.goto commands until repose is complete,
         //        Make a function that calls the robot.goto, only if the class bool, repositioning, is false,
         //        if true then wait 2 secs and then recall the function. Then change all robot.goto to that function")
@@ -299,9 +358,26 @@ class NavTestActivity : AppCompatActivity(), OnRobotReadyListener, OnGoToLocatio
         Log.d("Map","Repose status changed with status $status and description $description")
 
         if (status==4){
-            Log.d("Nav", "Waited for delay in Repose after positioning to account for system delays after callback. Ending and assuming that the code will restart going to $targetLocation")
-        }
+            Log.d("Nav", "Waited for delay in Repose after positioning to account for system delays after callback. Ending and will restart going to $targetLocation")
+            isPositioning = false
+            if (firebaseOnline) {
+                var bundle: Bundle = Bundle()
+                bundle.putString(FirebaseAnalytics.Param.ITEM_ID, "MapService")
+                bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, "Repositioning")
+                bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, "Complete")
+
+                firebaseAnalytics.logEvent("Map_Change", bundle)
+            }
+            robot.goTo(targetLocation)
+        }else if (robot.isReady && !isPositioning)  {
+                Log.d(TAG, "robot is ready, but positioning in progress")
+                isPositioning = true
+        }else isPositioning = true
+
     }
 
+    companion object {
+        private val TAG = "NavActivity"
+    }
 
 }

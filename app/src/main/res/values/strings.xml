@@ -87,4 +87,6 @@
     </string>
     <string name="Header_2">Temi Response Debug Menu</string>
     <string name="TestWorker">Run Worker Thread for Data Message</string>
+    <string name="Alarm_Subscribed">Subscribed to the AlarmResponse Topic</string>
+    <string name="Alarm_Subscribed_Failed">Failed to subscribe to the AlarmResponse Topic</string>
 </resources>

@@ -10,6 +10,35 @@
       "client_info": {
         "mobilesdk_app_id": "1:899035804859:android:323aabde655b6db267659e",
         "android_client_info": {
+          "package_name": "com.google.firebase.quickstart.fcm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "899035804859-snf1q8qe5v92d0fs8lqh4vqs5bne1nad.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCXKPvmKnbRaDRU4-KIHc7woJr4GigCO70"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "899035804859-8h1s5eoodjvd9dv9jm6b5sq2i365v52g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:899035804859:android:0cc8d653057c848167659e",
+        "android_client_info": {
           "package_name": "com.sam19hw.temiresponse"
         }
       },
